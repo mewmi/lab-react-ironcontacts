@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+.contactImg {
+  width: 100px;
+}
+
+.table {
+  margin-left: auto;
+  margin-right: auto;
+}

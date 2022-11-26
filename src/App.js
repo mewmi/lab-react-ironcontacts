@@ -1,25 +1,52 @@
 import "./App.css";
-import contacts from "./contacts.json";
+import contactList from "./contacts.json";
 import { useState } from "react";
 
 function App() {
-  const firstContacts = contacts.slice(0, 5);
+  const [contacts, setContacts] = useState(contactList.slice(0, 5));
 
-  const ContactList = () => {
-    const [contact, setContacts] = useState(firstContacts);
-
-    const addRandomContact = () => {
-      setContacts([...contact, Math.floor(Math.random() * contacts.length)]);
-    };
+  const handleAddRandomContact = () => {
+    const remainingContacts = contactList.filter((contact) => {
+      return !contacts.includes(contact);
+    });
+    if (remainingContacts.length) {
+      const randomContact =
+        remainingContacts[Math.floor(Math.random() * remainingContacts.length)];
+      setContacts([...contacts, randomContact]);
+    }
   };
+
+  const handleSortByName = () => {
+    const sortedContacts = [...contacts];
+    sortedContacts.sort((a, b) => {
+      return a.name.localeCompare(b.name);
+    });
+    setContacts(sortedContacts);
+  };
+
+  const handleSortByPopularity = () => {
+    const sortedContacts = [...contacts];
+    sortedContacts.sort((a, b) => {
+      return b.popularity - a.popularity;
+    });
+    setContacts(sortedContacts);
+  };
+
+  const handleDeleteContact = (id) => {
+    const contactsExcludingDeletedContact = contacts.filter((contact) => {
+      return contact.id !== id;
+    });
+    setContacts(contactsExcludingDeletedContact);
+  };
+
   return (
     <div className="App">
       <header>
         <b>IronContacts</b>
       </header>
-      <button>Add Random Contact</button>
-      <button>Sort by name</button>
-      <button>Sort by popularity</button>
+      <button onClick={handleAddRandomContact}>Add Random Contact</button>
+      <button onClick={handleSortByName}>Sort by name</button>
+      <button onClick={handleSortByPopularity}>Sort by popularity</button>
       <table className="table">
         <tr>
           <th>Picture</th>
@@ -27,21 +54,27 @@ function App() {
           <th>Popularity</th>
           <th>Won Oscar</th>
           <th>Won Emmy</th>
+          <th>Actions</th>
         </tr>
-        {firstContacts.map((val, key) => {
+        {contacts.map((contact) => {
           return (
-            <tr key={key}>
+            <tr key={contact.id}>
               <td>
                 <img
                   className="contactImg"
-                  src={val.pictureUrl}
-                  alt={val.name}
+                  src={contact.pictureUrl}
+                  alt={contact.name}
                 />
               </td>
-              <td>{val.name}</td>
-              <td>{val.popularity}</td>
-              <td>{!val.wonOscar ? "" : "🏆"}</td>
-              <td>{!val.wonEmmy ? "" : "🏆"}</td>
+              <td>{contact.name}</td>
+              <td>{contact.popularity.toFixed(2)}</td>
+              <td>{contact.wonOscar && "🏆"}</td>
+              <td>{contact.wonEmmy && "🏆"}</td>
+              <td>
+                <button onClick={() => handleDeleteContact(contact.id)}>
+                  Delete
+                </button>
+              </td>
             </tr>
           );
         })}
